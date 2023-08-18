@@ -46,7 +46,7 @@ const updateUserByID = async (req, res) => {
     }
     // console.log("user", user);
     const updatedUser = await user.save();
-    console.log("updatedUser", updatedUser);
+    // console.log("updatedUser", updatedUser);
     res.status(200).send({
       _id: updatedUser._id,
       firstName: updatedUser.firstName,
@@ -67,4 +67,50 @@ const deleteUser = async (req, res) => {
   }
 };
 
-export { getUserById, getAllUsers, updateUserByID, deleteUser };
+// const searchInDB = async (req, res) => {
+//   console.log("reqParams", req.params.key);
+//   if (req.params.key) {
+//     let data = await User.find({
+//       $or: [
+//         { firstName: { $regex: req.params.key, $options: "i" } },
+//         { email: { $regex: req.params.key, $options: "i" } },
+//       ],
+//     });
+//     if (data.length === 0) {
+//       return res.send(404).json({ message: "No data found" });
+//     }
+//     return res.json(data);
+//   } else {
+//     let allData = await User.find();
+//     if (allData.length === 0) {
+//       res.send(404).json({ message: "No data found" });
+//     }
+//     return res.send(allData);
+//   }
+// };
+
+const searchInDB = async (req, res) => {
+  console.log("reqParams", req.params.key);
+  // const uniqueEmails = await User.distinct("firstName");
+  // console.log(uniqueEmails);
+  if (req.params.key) {
+    let data = await User.find({
+      $or: [
+        { firstName: { $regex: req.params.key, $options: "i" } },
+        { email: { $regex: req.params.key, $options: "i" } },
+      ],
+    });
+    if (data.length === 0) {
+      return res.status(404).json({ message: "No data found" });
+    }
+    return res.json(data);
+  } else {
+    let allData = await User.find();
+    if (allData.length === 0) {
+      return res.status(404).json({ message: "No data found" });
+    }
+    return res.json(allData);
+  }
+};
+
+export { getUserById, getAllUsers, updateUserByID, deleteUser, searchInDB };
